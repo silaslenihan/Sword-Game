@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     float horizontalMove = 0f;
     bool jump = false;
     bool crouch = false;
+    bool jumpAttack = false;
     public bool swords = false;
 
     // Update is called once per frame
@@ -41,12 +42,20 @@ public class PlayerMovement : MonoBehaviour
         {
             crouch = false;
         }
+        if (swords && animator.GetBool("IsJumping") && Input.GetKey("right") && !jumpAttack) {
+            // Initialize jump attack
+            jumpAttack = true;
+            
+                
+        }
 
     }
 
     public void OnLanding()
     {
         animator.SetBool("IsJumping", false);
+        jumpAttack = false;
+        jump = false;
     }
 
    // public void OnCrouching(bool isCrouching)
@@ -56,9 +65,21 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Move our character
-        
+        if (jumpAttack)
+        {
+            Vector3 position = this.transform.position;
+            Vector3 scale = this.transform.localScale;
+            double scaleX = scale.x;
+            float velo = (float)0.125;
+            if (scaleX < 0)
+            {
+                velo *= -1;
+            }
+            position.x += velo;
+            this.transform.position = position;
+            Debug.Log("Bruh");
+        }
         controller.Move(horizontalMove * Time.fixedDeltaTime, crouch, jump);
-        jump = false;
+        //jump = false;
     }
 }
