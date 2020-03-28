@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public float runSpeed = 40f;
 
     float horizontalMove = 0f;
+    private float timeGuy = 0.3f;
     bool jump = false;
     bool crouch = false;
     bool jumpAttack = false;
@@ -46,16 +47,15 @@ public class PlayerMovement : MonoBehaviour
             // Initialize jump attack
             jumpAttack = true;
             
-                
         }
-
-    }
+}
 
     public void OnLanding()
     {
         animator.SetBool("IsJumping", false);
         jumpAttack = false;
         jump = false;
+        timeGuy = 0.3f;
     }
 
    // public void OnCrouching(bool isCrouching)
@@ -67,19 +67,30 @@ public class PlayerMovement : MonoBehaviour
     {
         if (jumpAttack)
         {
-            Vector3 position = this.transform.position;
-            Vector3 scale = this.transform.localScale;
-            double scaleX = scale.x;
-            float velo = (float)0.125;
-            if (scaleX < 0)
-            {
-                velo *= -1;
-            }
-            position.x += velo;
-            this.transform.position = position;
-            Debug.Log("Bruh");
+            doJumpAttack();
         }
         controller.Move(horizontalMove * Time.fixedDeltaTime, crouch, jump);
         //jump = false;
+    }
+
+    void doJumpAttack()
+    {
+        if (timeGuy < 0)
+            OnLanding();
+
+        timeGuy -= Time.deltaTime;
+        Debug.Log(timeGuy);
+
+        Vector3 position = this.transform.position;
+        Vector3 scale = this.transform.localScale;
+        double scaleX = scale.x;
+        float velo = (float)0.125;
+        if (scaleX < 0)
+        {
+            velo *= -1;
+        }
+        position.x += velo;
+        this.transform.position = position;
+        Debug.Log("Bruh");
     }
 }
