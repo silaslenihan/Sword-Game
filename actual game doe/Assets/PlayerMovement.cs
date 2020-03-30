@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     bool jump = false;
     bool crouch = false;
     bool jumpAttack = false;
+    bool jumpAttackEnd = false;
     public bool swords = false;
 
     // Update is called once per frame
@@ -46,13 +47,15 @@ public class PlayerMovement : MonoBehaviour
         if (swords && animator.GetBool("IsJumping") && Input.GetKey("right") && !jumpAttack) {
             // Initialize jump attack
             jumpAttack = true;
-            
+            animator.SetBool("JumpSlice", true);
+
         }
 }
 
     public void OnLanding()
     {
         animator.SetBool("IsJumping", false);
+        animator.SetBool("JumpSlice", false);
         jumpAttack = false;
         jump = false;
         timeGuy = 0.3f;
@@ -66,31 +69,35 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
         if (jumpAttack)
-        {
             doJumpAttack();
-        }
+ 
+        
         controller.Move(horizontalMove * Time.fixedDeltaTime, crouch, jump);
         //jump = false;
     }
 
+
     void doJumpAttack()
     {
         if (timeGuy < 0)
-            OnLanding();
-
-        timeGuy -= Time.deltaTime;
-        Debug.Log(timeGuy);
-
-        Vector3 position = this.transform.position;
-        Vector3 scale = this.transform.localScale;
-        double scaleX = scale.x;
-        float velo = (float)0.125;
-        if (scaleX < 0)
         {
-            velo *= -1;
+            OnLanding();
         }
-        position.x += velo;
-        this.transform.position = position;
-        Debug.Log("Bruh");
+        else
+        {
+            timeGuy -= Time.deltaTime;
+
+            Vector3 position = this.transform.position;
+            Vector3 scale = this.transform.localScale;
+            double scaleX = scale.x;
+            float velo = (float)0.125;
+            // flip velocity if facing negative direction
+            if (scaleX < 0)
+            {
+                velo *= -1;
+            }
+            position.x += velo;
+            this.transform.position = position;
+        }
     }
 }
